@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- 背景圆 -->
+    <path
+        android:fillColor="#2196F3"
+        android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0" />
+    <!-- TV 图标 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,55h110v80h-110z
+                         M55,65v60h90v-60z
+                         M70,140h60v10h-60z" />
+    <!-- 播放图标 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,80l0,30l25,-15z" />
+</vector>

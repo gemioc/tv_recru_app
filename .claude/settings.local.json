@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew clean:*)",
+      "Bash(cd:*)",
+      "Bash(ipconfig)",
+      "Bash(netstat -ano)",
+      "Bash(findstr \":8080\")",
+      "Bash(findstr \"LISTENING\")",
+      "Bash(findstr -E \":5173 :3000 :8081\")",
+      "Bash(npm run:*)",
+      "Bash(findstr -E \":5173 :5174 :3000\")",
+      "Bash(curl:*)",
+      "Bash(adb shell:*)",
+      "Bash(where adb:*)",
+      "Read(//d/B-code_space/tv_recru_app/$LOCALAPPDATA/Android/**)",
+      "Read(//d/B-code_space/tv_recru_app/**)",
+      "Read(//d/B-code_space/tv_recru_app/$LOCALAPPDATA/Android/Sdk/platform-tools/**)",
+      "Bash(\"C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" shell:*)",
+      "Bash(\"C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" logcat:*)",
+      "Bash(./gradlew.bat assembleDebug)",
+      "Bash(where gradle:*)",
+      "Bash(\"C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" devices:*)",
+      "Bash(./gradlew assembleDebug)",
+      "Bash(gradlew.bat assembleDebug)",
+      "Bash(cmd.exe /c \"cd /d D:\\\\B-code_space\\\\tv_recru_app && gradlew.bat assembleDebug\" 2>&1)",
+      "Bash(powershell.exe -Command \"cd 'D:\\\\B-code_space\\\\tv_recru_app'; .\\\\gradlew.bat assembleDebug\" 2>&1)",
+      "Bash(powershell.exe -Command \"cd 'D:\\\\B-code_space\\\\tv_recru_app'; gradle wrapper\" 2>&1)",
+      "Bash(powershell.exe -Command \"adb logcat -d -t 100 | Select-String -Pattern 'tv.terminal|AndroidRuntime|FATAL|Exception|Error'\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-ChildItem -Path 'C:\\\\Users' -Recurse -Filter 'adb.exe' -ErrorAction SilentlyContinue 2>$null | Select-Object -First 3 -ExpandProperty FullName\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-ChildItem -Path 'C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools' -Filter 'adb.exe' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-Process -Name 'java' -ErrorAction SilentlyContinue | Select-Object Id, ProcessName, MainWindowTitle\" 2>&1)",
+      "Bash(mysql -u root -proot tv_recruitment -e \"UPDATE t_poster_template SET template_name=''现代简约风'', template_path=''/templates/template-modern.svg'', preview_path=''/templates/template-modern.svg'', color_scheme=''PURPLE'' WHERE id=1; DELETE FROM t_poster_template WHERE id IN \\(2,3\\);\")",
+      "Bash(powershell.exe -Command \"& 'C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe' shell screencap -p /sdcard/screen.png && adb pull /sdcard/screen.png D:/B-code_space/tv-files/resume/reference.png\" 2>&1)",
+      "Bash(identify \"D:/B-code_space/tv-files/resume/r1.png\" \"D:/B-code_space/tv-files/resume/r3.png\")",
+      "WebSearch"
+    ]
+  }
+}

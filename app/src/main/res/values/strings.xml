@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">电视招聘展示</string>
+    <string name="status_online">在线</string>
+    <string name="status_offline">离线</string>
+    <string name="connecting">连接中...</string>
+    <string name="setting_title">系统设置</string>
+    <string name="setting_server">服务器地址</string>
+    <string name="setting_device_code">设备编码</string>
+    <string name="setting_save">保存</string>
+    <string name="hint_server">请输入服务器地址</string>
+    <string name="hint_device_code">设备编码自动生成</string>
+</resources>
