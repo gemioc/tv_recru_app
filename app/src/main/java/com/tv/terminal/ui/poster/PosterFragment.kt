@@ -165,6 +165,25 @@ class PosterFragment : Fragment() {
     }
 
     /**
+     * 暂停轮播
+     */
+    fun pause() {
+        Log.d(TAG, "pause")
+        handler.removeCallbacks(autoPlayRunnable)
+    }
+
+    /**
+     * 恢复轮播
+     */
+    fun resume() {
+        Log.d(TAG, "resume")
+        // 如果有多张海报且开启了循环，恢复轮播
+        if (posterList.size > 1 && playRule?.loop == true) {
+            handler.postDelayed(autoPlayRunnable, playRule!!.duration * 1000L)
+        }
+    }
+
+    /**
      * 上报播放状态
      */
     private fun reportStatus(contentId: Long, contentType: String) {

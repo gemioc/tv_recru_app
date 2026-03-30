@@ -33,7 +33,8 @@
       "Bash(mysql -u root -proot tv_recruitment -e \"UPDATE t_poster_template SET template_name=''现代简约风'', template_path=''/templates/template-modern.svg'', preview_path=''/templates/template-modern.svg'', color_scheme=''PURPLE'' WHERE id=1; DELETE FROM t_poster_template WHERE id IN \\(2,3\\);\")",
       "Bash(powershell.exe -Command \"& 'C:\\\\Users\\\\86185\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe' shell screencap -p /sdcard/screen.png && adb pull /sdcard/screen.png D:/B-code_space/tv-files/resume/reference.png\" 2>&1)",
       "Bash(identify \"D:/B-code_space/tv-files/resume/r1.png\" \"D:/B-code_space/tv-files/resume/r3.png\")",
-      "WebSearch"
+      "WebSearch",
+      "Bash(mvn compile:*)"
     ]
   }
 }

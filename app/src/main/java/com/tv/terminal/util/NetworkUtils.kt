@@ -27,6 +27,7 @@ object NetworkUtils {
         } else {
             // Android 5.0-5.1 (API 21-22)
             @Suppress("DEPRECATION")
+
             val networkInfo = connectivityManager.activeNetworkInfo
             networkInfo != null && networkInfo.isConnected
         }

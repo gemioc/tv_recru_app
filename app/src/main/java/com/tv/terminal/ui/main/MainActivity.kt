@@ -63,6 +63,9 @@ class MainActivity : AppCompatActivity() {
 
         // 设置长按监听
         setupLongPressListener()
+
+        // 设置退出按钮
+        setupExitButton()
     }
 
     /**
@@ -163,8 +166,14 @@ class MainActivity : AppCompatActivity() {
 
         when (message.data.action) {
             "restart" -> restartApp()
-            "pause" -> videoFragment?.pause()
-            "resume" -> videoFragment?.resume()
+            "pause" -> {
+                videoFragment?.pause()
+                posterFragment?.pause()
+            }
+            "resume" -> {
+                videoFragment?.resume()
+                posterFragment?.resume()
+            }
         }
     }
 
@@ -348,6 +357,15 @@ class MainActivity : AppCompatActivity() {
     private fun openSetting() {
         val intent = Intent(this, SettingActivity::class.java)
         startActivity(intent)
+    }
+
+    /**
+     * 设置退出按钮
+     */
+    private fun setupExitButton() {
+        binding.exitButton.setOnClickListener {
+            finishAffinity()
+        }
     }
 
     /**

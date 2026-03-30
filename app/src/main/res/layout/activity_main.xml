@@ -67,6 +67,17 @@
             android:textSize="16sp"
             tools:text="14:30" />
 
+        <!-- 退出按钮 -->
+        <Button
+            android:id="@+id/exitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="24dp"
+            android:text="@string/exit_app"
+            android:textSize="14sp"
+            android:backgroundTint="#FF4444"
+            android:textColor="@android:color/white" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

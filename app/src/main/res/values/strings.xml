@@ -10,4 +10,5 @@
     <string name="setting_save">保存</string>
     <string name="hint_server">请输入服务器地址</string>
     <string name="hint_device_code">设备编码自动生成</string>
+    <string name="exit_app">退出</string>
 </resources>
