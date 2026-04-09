@@ -16,7 +16,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import com.tv.terminal.R
 import com.tv.terminal.data.remote.model.ContentItem
 import com.tv.terminal.data.remote.model.PlayRule
 import com.tv.terminal.databinding.FragmentPosterBinding

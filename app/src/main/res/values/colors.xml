@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="splash_background">#000000</color>
+    <color name="splash_background">#0F0F23</color>
+    <color name="primary">#667EEA</color>
+    <color name="primary_dark">#764BA2</color>
     <color name="status_online">#4CAF50</color>
     <color name="status_offline">#F44336</color>
     <color name="text_primary">#FFFFFF</color>

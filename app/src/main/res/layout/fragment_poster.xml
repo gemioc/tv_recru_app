@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@drawable/main_background">
 
     <!-- 海报图片 - 居中显示，保持比例 -->
     <ImageView

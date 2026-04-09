@@ -1,9 +1,6 @@
 package com.tv.terminal.util
 
-import android.content.Context
-import android.net.wifi.WifiManager
 import android.os.Build
-import android.provider.Settings
 import java.net.NetworkInterface
 
 /**
@@ -60,36 +57,5 @@ object DeviceUtils {
      */
     fun getDeviceBrand(): String {
         return Build.BRAND ?: "Unknown"
-    }
-
-    /**
-     * 获取 Android 版本
-     */
-    fun getAndroidVersion(): String {
-        return Build.VERSION.RELEASE ?: "Unknown"
-    }
-
-    /**
-     * 获取设备唯一标识
-     */
-    fun getDeviceId(context: Context): String {
-        return Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ANDROID_ID
-        ) ?: ""
-    }
-
-    /**
-     * 获取 IP 地址
-     */
-    fun getIpAddress(context: Context): String {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val wifiInfo = wifiManager.connectionInfo
-        val ipAddress = wifiInfo.ipAddress
-        return if (ipAddress != 0) {
-            "${ipAddress and 0xFF}.${ipAddress shr 8 and 0xFF}.${ipAddress shr 16 and 0xFF}.${ipAddress shr 24 and 0xFF}"
-        } else {
-            "0.0.0.0"
-        }
     }
 }

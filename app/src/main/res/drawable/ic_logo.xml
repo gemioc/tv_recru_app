@@ -4,18 +4,53 @@
     android:height="200dp"
     android:viewportWidth="200"
     android:viewportHeight="200">
-    <!-- 背景圆 -->
+    <!-- 背景圆环 -->
     <path
-        android:fillColor="#2196F3"
-        android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0" />
-    <!-- TV 图标 -->
+        android:fillColor="#667EEA"
+        android:pathData="M100,100m-95,0a95,95 0,1 1,190 0a95,95 0,1 1,-190 0" />
+    <!-- 内圆 -->
+    <path
+        android:fillColor="#764BA2"
+        android:pathData="M100,100m-75,0a75,75 0,1 1,150 0a75,75 0,1 1,-150 0" />
+    <!-- 电视屏幕背景 -->
+    <path
+        android:fillColor="#1A1A2E"
+        android:pathData="M40,50h120a5,5 0,0 1,5 5v70a5,5 0,0 1,-5 5h-120a5,5 0,0 1,-5 -5v-70a5,5 0,0 1,5 -5z" />
+    <!-- 电视屏幕 -->
+    <path
+        android:fillColor="#0F0F1A"
+        android:pathData="M45,55h110v60h-110z" />
+    <!-- 顶部边框线 -->
+    <path
+        android:fillColor="#667EEA"
+        android:pathData="M45,55h110v3h-110z" />
+    <!-- 电视支架 -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M45,55h110v80h-110z
-                         M55,65v60h90v-60z
-                         M70,140h60v10h-60z" />
-    <!-- 播放图标 -->
+        android:pathData="M80,135h40v8h-40z" />
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M85,80l0,30l25,-15z" />
+        android:pathData="M70,143h60v5h-60z" />
+    <!-- 播放按钮 -->
+    <path
+        android:fillColor="#667EEA"
+        android:pathData="M85,75l0,25l20,-12.5z" />
+    <!-- 信号波纹 -->
+    <path
+        android:strokeColor="#667EEA"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.6"
+        android:pathData="M120,65a25,25 0,0 1,0 35" />
+    <path
+        android:strokeColor="#667EEA"
+        android:strokeWidth="2"
+        android:strokeAlpha="0.4"
+        android:pathData="M125,60a35,35 0,0 1,0 45" />
+    <!-- 装饰点 -->
+    <path
+        android:fillColor="#764BA2"
+        android:pathData="M55,140m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
+    <path
+        android:fillColor="#667EEA"
+        android:pathData="M145,140m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0" />
 </vector>

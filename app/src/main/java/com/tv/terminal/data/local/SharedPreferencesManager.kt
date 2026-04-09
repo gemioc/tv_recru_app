@@ -63,20 +63,6 @@ object SharedPreferencesManager {
     }
 
     /**
-     * 检查是否已初始化
-     */
-    fun isInitialized(): Boolean {
-        return getDeviceCode().isNotEmpty() && getServerUrl().isNotEmpty()
-    }
-
-    /**
-     * 清除服务器地址（用于重新配置）
-     */
-    fun clearServerUrl() {
-        getPrefs().edit().remove(KEY_SERVER_URL).apply()
-    }
-
-    /**
      * 清除所有配置
      */
     fun clearAll() {

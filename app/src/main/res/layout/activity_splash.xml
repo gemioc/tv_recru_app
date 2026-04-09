@@ -4,20 +4,43 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@drawable/splash_background">
 
-    <!-- Logo -->
-    <ImageView
-        android:id="@+id/logoImage"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:src="@drawable/ic_logo"
-        android:contentDescription="@string/app_name"
+    <!-- 顶部装饰光晕 -->
+    <View
+        android:id="@+id/topGlow"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:background="@drawable/glow_circle"
+        android:alpha="0.3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="-100dp" />
+
+    <!-- Logo 容器 -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/logoCard"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="20dp"
+        app:cardBackgroundColor="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/appNameText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintVertical_bias="0.38"
+        app:layout_constraintVertical_chainStyle="packed">
+
+        <ImageView
+            android:id="@+id/logoImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_logo"
+            android:contentDescription="@string/app_name"
+            android:scaleType="centerCrop" />
+    </androidx.cardview.widget.CardView>
 
     <!-- App Name -->
     <TextView
@@ -26,25 +49,68 @@
         android:layout_height="wrap_content"
         android:text="@string/app_name"
         android:textColor="@color/text_primary"
-        android:textSize="36sp"
+        android:textSize="32sp"
         android:textStyle="bold"
-        android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/logoImage"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:letterSpacing="0.15"
+        android:layout_marginTop="28dp"
+        app:layout_constraintTop_toBottomOf="@id/logoCard"
+        app:layout_constraintBottom_toTopOf="@id/taglineText"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Tagline -->
+    <TextView
+        android:id="@+id/taglineText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="智能招聘 · 精准展示"
+        android:textColor="#B0B0B0"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/appNameText"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Loading indicator -->
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_marginTop="48dp"
         android:indeterminate="true"
-        android:indeterminateTint="@color/status_online"
-        app:layout_constraintTop_toBottomOf="@id/appNameText"
+        android:indeterminateTintMode="src_in"
+        android:indeterminateTint="@color/primary"
+        app:layout_constraintTop_toBottomOf="@id/taglineText"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="60dp" />
+
+    <!-- 连接状态文字 -->
+    <TextView
+        android:id="@+id/connectingText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/connecting"
+        android:textColor="#808080"
+        android:textSize="12sp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone" />
+
+    <!-- 底部装饰光晕 -->
+    <View
+        android:id="@+id/bottomGlow"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/glow_circle"
+        android:alpha="0.15"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="-80dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

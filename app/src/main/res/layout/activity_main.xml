@@ -6,7 +6,7 @@
     android:id="@+id/rootContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@drawable/main_background">
 
     <!-- 内容展示区域 -->
     <FrameLayout
@@ -14,21 +14,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- 底部状态栏 -->
+    <!-- 顶部状态栏 -->
     <LinearLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="50dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:background="#80000000"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- 在线状态指示器 -->
+        <!-- 左侧：在线状态 -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,8 +35,8 @@
 
             <View
                 android:id="@+id/statusIndicator"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
                 android:background="@drawable/status_indicator_offline" />
 
             <TextView
@@ -48,35 +46,29 @@
                 android:layout_marginStart="8dp"
                 android:text="@string/status_offline"
                 android:textColor="@color/text_secondary"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
-        <!-- 占位 -->
-        <View
+        <!-- 中间：设备信息 -->
+        <TextView
+            android:id="@+id/deviceCodeText"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="#606060"
+            android:textSize="13sp"
+            tools:text="设备: TV-001" />
 
-        <!-- 当前时间 -->
+        <!-- 右侧：当前时间 -->
         <TextView
             android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_secondary"
-            android:textSize="16sp"
-            tools:text="14:30" />
-
-        <!-- 退出按钮 -->
-        <Button
-            android:id="@+id/exitButton"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginStart="24dp"
-            android:text="@string/exit_app"
             android:textSize="14sp"
-            android:backgroundTint="#FF4444"
-            android:textColor="@android:color/white" />
+            tools:text="14:30" />
 
     </LinearLayout>
 

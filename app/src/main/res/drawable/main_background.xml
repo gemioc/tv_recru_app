@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 渐变背景 -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="linear"
+                android:angle="135"
+                android:startColor="#0F0F23"
+                android:centerColor="#1A1A2E"
+                android:endColor="#16213E" />
+        </shape>
+    </item>
+    <!-- 顶部光晕 -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="400dp" android:height="400dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="200dp"
+                android:centerX="0.5"
+                android:centerY="0"
+                android:startColor="#30667EEA"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- 右下角光晕 -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="350dp" android:height="350dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="175dp"
+                android:centerX="1"
+                android:centerY="1"
+                android:startColor="#20764BA2"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+    <!-- 左下角装饰 -->
+    <item>
+        <shape android:shape="oval">
+            <size android:width="200dp" android:height="200dp" />
+            <gradient
+                android:type="radial"
+                android:gradientRadius="100dp"
+                android:centerX="0"
+                android:centerY="1"
+                android:startColor="#104CAF50"
+                android:endColor="#00000000" />
+        </shape>
+    </item>
+</layer-list>

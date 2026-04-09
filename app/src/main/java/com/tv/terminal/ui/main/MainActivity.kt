@@ -42,7 +42,6 @@ class MainActivity : AppCompatActivity() {
     // 长按检测
     private var longPressHandler = Handler(Looper.getMainLooper())
     private var longPressRunnable: Runnable? = null
-    private var touchStartTime = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +54,9 @@ class MainActivity : AppCompatActivity() {
         // 初始化 WebSocket
         initWebSocket()
 
+        // 显示设备编码
+        binding.deviceCodeText.text = "设备: ${SharedPreferencesManager.getDeviceCode()}"
+
         // 观察数据
         observeData()
 
@@ -63,9 +65,6 @@ class MainActivity : AppCompatActivity() {
 
         // 设置长按监听
         setupLongPressListener()
-
-        // 设置退出按钮
-        setupExitButton()
     }
 
     /**
@@ -73,9 +72,12 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setupFullScreen() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
         window.decorView.systemUiVisibility = (
-            View.SYSTEM_UI_FLAG_FULLSCREEN
-            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         )
     }
@@ -201,7 +203,7 @@ class MainActivity : AppCompatActivity() {
             posterFragment = PosterFragment.newInstance()
             supportFragmentManager.beginTransaction()
                 .add(R.id.contentContainer, posterFragment!!)
-                .commitNow()  // 使用 commitNow 确保立即附加
+                .commitNow()
         } else {
             supportFragmentManager.beginTransaction()
                 .show(posterFragment!!)
@@ -243,7 +245,7 @@ class MainActivity : AppCompatActivity() {
             videoFragment = VideoFragment.newInstance()
             supportFragmentManager.beginTransaction()
                 .add(R.id.contentContainer, videoFragment!!)
-                .commitNow()  // 使用 commitNow 确保立即附加
+                .commitNow()
         } else {
             supportFragmentManager.beginTransaction()
                 .show(videoFragment!!)
@@ -333,7 +335,6 @@ class MainActivity : AppCompatActivity() {
         binding.rootContainer.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
-                    touchStartTime = System.currentTimeMillis()
                     longPressRunnable = Runnable {
                         openSetting()
                     }
@@ -357,15 +358,6 @@ class MainActivity : AppCompatActivity() {
     private fun openSetting() {
         val intent = Intent(this, SettingActivity::class.java)
         startActivity(intent)
-    }
-
-    /**
-     * 设置退出按钮
-     */
-    private fun setupExitButton() {
-        binding.exitButton.setOnClickListener {
-            finishAffinity()
-        }
     }
 
     /**
