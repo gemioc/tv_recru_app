@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import androidx.activity.viewModels
@@ -375,6 +376,24 @@ class MainActivity : AppCompatActivity() {
         heartbeatManager.stop()
         webSocketManager.disconnect()
         longPressHandler.removeCallbacksAndMessages(null)
+    }
+
+    /**
+     * 遥控器按键处理
+     * 按菜单键或播放键打开设置页面
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_MENU -> {
+                openSetting()
+                return true
+            }
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                openSetting()
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     companion object {
