@@ -1,13 +1,16 @@
 package com.tv.terminal.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.util.Log
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -36,6 +39,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webSocketManager: WebSocketManager
     private lateinit var heartbeatManager: HeartbeatManager
+    private var wakeLock: PowerManager.WakeLock? = null
 
     private var posterFragment: PosterFragment? = null
     private var videoFragment: VideoFragment? = null
@@ -48,6 +52,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // 获取WakeLock防止息屏
+        acquireWakeLock()
 
         // 全屏显示
         setupFullScreen()
@@ -84,6 +91,36 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * 获取WakeLock防止息屏
+     */
+    private fun acquireWakeLock() {
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "TvTerminal:WakeLock"
+        )
+        wakeLock?.acquire(10 * 60 * 1000L) // 10分钟超时
+    }
+
+    /**
+     * 唤醒屏幕
+     */
+    private fun wakeUpScreen() {
+        Log.d(TAG, "Waking up screen...")
+        // 点亮屏幕
+        wakeLock?.let {
+            if (!it.isHeld) {
+                it.acquire(10 * 60 * 1000L)
+            }
+        }
+        // 唤醒屏幕
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+
+    }
+
+    /**
      * 初始化 WebSocket
      */
     private fun initWebSocket() {
@@ -96,10 +133,12 @@ class MainActivity : AppCompatActivity() {
         // 连接服务器
         webSocketManager.connect(serverUrl)
 
-        // 监听消息
-        lifecycleScope.launch {
-            webSocketManager.messageFlow.collect { message ->
-                handleMessage(message)
+        // 监听消息 - 使用全局作用域，不受生命周期影响
+        webSocketManager.messageFlow.let { flow ->
+            lifecycleScope.launch {
+                flow.collect { message ->
+                    handleMessage(message)
+                }
             }
         }
 
@@ -139,6 +178,9 @@ class MainActivity : AppCompatActivity() {
 
         Log.d(TAG, "Push content: type=${contentData.contentType}")
 
+        // 唤醒屏幕
+        wakeUpScreen()
+
         // 兼容两种格式：单内容URL 或 多内容列表
         val contents = contentData.contents ?: listOf(
             ContentItem(
@@ -169,6 +211,7 @@ class MainActivity : AppCompatActivity() {
 
         when (message.data.action) {
             "restart" -> restartApp()
+            "wakeup" -> wakeUpScreen()
             "pause" -> {
                 videoFragment?.pause()
                 posterFragment?.pause()
@@ -376,6 +419,7 @@ class MainActivity : AppCompatActivity() {
         heartbeatManager.stop()
         webSocketManager.disconnect()
         longPressHandler.removeCallbacksAndMessages(null)
+        wakeLock?.release()
     }
 
     /**

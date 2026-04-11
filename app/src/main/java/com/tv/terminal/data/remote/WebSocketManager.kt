@@ -6,6 +6,7 @@ import com.google.gson.JsonObject
 import com.tv.terminal.data.remote.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +40,9 @@ class WebSocketManager(
         .build()
 
     private val gson = Gson()
+
+    // 消息处理作用域 - 不受Activity生命周期影响
+    private val messageScope = CoroutineScope(Dispatchers.Main + Job())
 
     // 连接状态
     private val _connectionState = MutableStateFlow<ConnectionState>(ConnectionState.Disconnected)
@@ -77,7 +81,8 @@ class WebSocketManager(
                 Log.d(TAG, "Received message: $text")
                 val message = parseMessage(text)
                 message?.let {
-                    CoroutineScope(Dispatchers.Main).launch {
+                    // 使用独立作用域接收消息，即使Activity在后台也能处理
+                    messageScope.launch(Dispatchers.Main) {
                         _messageFlow.emit(it)
                     }
                 }
