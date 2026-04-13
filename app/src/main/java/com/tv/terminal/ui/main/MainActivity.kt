@@ -194,6 +194,7 @@ class MainActivity : AppCompatActivity() {
         when (contentData.contentType) {
             "poster" -> showPoster(contents, rule)
             "video" -> showVideo(contents, rule)
+            "image" -> showPoster(contents, rule) // 图片复用海报展示逻辑
         }
 
         // 发送推送确认

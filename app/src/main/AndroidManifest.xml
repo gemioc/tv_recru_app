@@ -36,15 +36,20 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="34">
 
-        <!-- 启动页 -->
+        <!-- 启动页 - 配置为电视信源 -->
         <activity
             android:name=".ui.splash.SplashActivity"
             android:exported="true"
+            android:launchMode="singleInstance"
+            android:clearTaskOnLaunch="true"
             android:theme="@style/Theme.TvTerminal.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <!-- 关键：添加 HOME 和 DEFAULT 使其成为电视信源 -->
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
@@ -52,7 +57,8 @@
         <activity
             android:name=".ui.main.MainActivity"
             android:screenOrientation="landscape"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
 
         <!-- 设置页 -->
         <activity
