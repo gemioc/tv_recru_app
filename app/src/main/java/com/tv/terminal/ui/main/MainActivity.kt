@@ -24,6 +24,7 @@ import com.tv.terminal.databinding.ActivityMainBinding
 import com.tv.terminal.ui.poster.PosterFragment
 import com.tv.terminal.ui.setting.SettingActivity
 import com.tv.terminal.ui.video.VideoFragment
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,17 +45,28 @@ class MainActivity : AppCompatActivity() {
     private var posterFragment: PosterFragment? = null
     private var videoFragment: VideoFragment? = null
 
+    // 服务器时间偏移量（用于同步真实时间）
+    private var serverTimeOffset = 0L
+
     // 长按检测
     private var longPressHandler = Handler(Looper.getMainLooper())
     private var longPressRunnable: Runnable? = null
+
+    // WakeLock 续期 Handler
+    private val wakeLockHandler = Handler(Looper.getMainLooper())
+    private var wakeLockRenewer: Runnable? = null
+
+    // 用户 activity 模拟 Handler（防止某些定制固件息屏）
+    private val userActivityHandler = Handler(Looper.getMainLooper())
+    private var userActivityRunnable: Runnable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 获取WakeLock防止息屏
-        acquireWakeLock()
+        // 保持屏幕常亮（多重保障）
+        acquireAndKeepWakeLock()
 
         // 全屏显示
         setupFullScreen()
@@ -76,6 +88,101 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * 保持屏幕常亮 - 多重保障机制
+     * 1. FLAG_KEEP_SCREEN_ON - 基本保障
+     * 2. WakeLock - 强制唤醒
+     * 3. WakeLock 续期 - 防止超时释放
+     * 4. 用户 activity 模拟 - 防止国产定制固件息屏
+     */
+    private fun acquireAndKeepWakeLock() {
+        // 1. FLAG_KEEP_SCREEN_ON（基本保障，最简单有效）
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        Log.d(TAG, "FLAG_KEEP_SCREEN_ON enabled")
+
+        // 2. WakeLock（强制唤醒，防止系统休眠）
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "TvTerminal:WakeLock"
+        )
+        wakeLock?.acquire() // 不带超时，持续有效直到主动 release
+        Log.d(TAG, "WakeLock acquired")
+
+        // 3. 启动 WakeLock 续期（防止系统强制释放）
+        startWakeLockRenewer()
+
+        // 4. 启动用户 activity 模拟（针对国产定制固件）
+        startUserActivitySimulation()
+    }
+
+    /**
+     * 启动 WakeLock 续期机制
+     * 每 8 分钟检查并续期一次（在超时前 2 分钟续期）
+     */
+    private fun startWakeLockRenewer() {
+        wakeLockRenewer = object : Runnable {
+            override fun run() {
+                wakeLock?.let {
+                    if (!it.isHeld) {
+                        it.acquire()
+                        Log.d(TAG, "WakeLock renewed")
+                    }
+                }
+                wakeLockHandler.postDelayed(this, WAKELOCK_RENEW_INTERVAL)
+            }
+        }
+        // 延迟 8 分钟后开始续期（WakeLock 默认 10 分钟超时）
+        wakeLockHandler.postDelayed(wakeLockRenewer!!, WAKELOCK_RENEW_INTERVAL)
+        Log.d(TAG, "WakeLock renewer started, interval: ${WAKELOCK_RENEW_INTERVAL}ms")
+    }
+
+    /**
+     * 启动用户 activity 模拟
+     * 某些国产定制固件的 TV 设备会在无操作后强制息屏，
+     * 通过模拟用户按键事件防止息屏
+     */
+    private fun startUserActivitySimulation() {
+        userActivityRunnable = object : Runnable {
+            override fun run() {
+                try {
+                    // 模拟耳机按钮按下事件（不会产生声音或实际效果）
+                    val eventDown = KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_HEADSETHOOK)
+                    dispatchKeyEvent(eventDown)
+
+                    // 模拟松开
+                    val eventUp = KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_HEADSETHOOK)
+                    dispatchKeyEvent(eventUp)
+
+                    Log.d(TAG, "User activity simulated")
+                } catch (e: Exception) {
+                    Log.e(TAG, "User activity simulation failed: ${e.message}")
+                }
+                userActivityHandler.postDelayed(this, USER_ACTIVITY_INTERVAL)
+            }
+        }
+        // 延迟 2 分钟后开始模拟（每 3 分钟模拟一次）
+        userActivityHandler.postDelayed(userActivityRunnable!!, USER_ACTIVITY_INTERVAL)
+        Log.d(TAG, "User activity simulation started, interval: ${USER_ACTIVITY_INTERVAL}ms")
+    }
+
+    /**
+     * 唤醒屏幕（收到推送内容时调用）
+     */
+    private fun wakeUpScreen() {
+        Log.d(TAG, "Waking up screen...")
+        // 点亮屏幕
+        wakeLock?.let {
+            if (!it.isHeld) {
+                it.acquire()
+            }
+        }
+        // 唤醒屏幕
+        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+    }
+
+    /**
      * 设置全屏
      */
     private fun setupFullScreen() {
@@ -88,36 +195,6 @@ class MainActivity : AppCompatActivity() {
             or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
             or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         )
-    }
-
-    /**
-     * 获取WakeLock防止息屏
-     */
-    private fun acquireWakeLock() {
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(
-            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "TvTerminal:WakeLock"
-        )
-        wakeLock?.acquire(10 * 60 * 1000L) // 10分钟超时
-    }
-
-    /**
-     * 唤醒屏幕
-     */
-    private fun wakeUpScreen() {
-        Log.d(TAG, "Waking up screen...")
-        // 点亮屏幕
-        wakeLock?.let {
-            if (!it.isHeld) {
-                it.acquire(10 * 60 * 1000L)
-            }
-        }
-        // 唤醒屏幕
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
-
     }
 
     /**
@@ -166,6 +243,8 @@ class MainActivity : AppCompatActivity() {
                 // 心跳响应
                 heartbeatManager.resetCount()
                 viewModel.updateConnectionState(true)
+                // 同步服务器时间
+                syncServerTime(message.timestamp)
             }
         }
     }
@@ -361,15 +440,38 @@ class MainActivity : AppCompatActivity() {
      */
     private fun startTimeUpdater() {
         val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+        timeFormat.timeZone = TimeZone.getDefault()
+
+        // 立即更新时间，不等待定时器
+        binding.timeText.text = timeFormat.format(getServerTime())
 
         val runnable = object : Runnable {
             override fun run() {
-                binding.timeText.text = timeFormat.format(Date())
+                binding.timeText.text = timeFormat.format(getServerTime())
                 longPressHandler.postDelayed(this, TIME_UPDATE_INTERVAL)
             }
         }
 
-        longPressHandler.post(runnable)
+        longPressHandler.postDelayed(runnable, TIME_UPDATE_INTERVAL)
+    }
+
+    /**
+     * 获取服务器时间（本地时间 + 偏移量）
+     */
+    private fun getServerTime(): Date {
+        return Date(System.currentTimeMillis() + serverTimeOffset)
+    }
+
+    /**
+     * 同步服务器时间
+     * @param serverTimestamp 服务器时间戳
+     */
+    private fun syncServerTime(serverTimestamp: Long) {
+        // 计算偏移量
+        serverTimeOffset = serverTimestamp - System.currentTimeMillis()
+        Log.d(TAG, "服务器时间同步完成，偏移量: ${serverTimeOffset}ms")
+        // 立即更新时间显示
+        binding.timeText.text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(getServerTime())
     }
 
     /**
@@ -420,7 +522,20 @@ class MainActivity : AppCompatActivity() {
         heartbeatManager.stop()
         webSocketManager.disconnect()
         longPressHandler.removeCallbacksAndMessages(null)
-        wakeLock?.release()
+
+        // 停止 WakeLock 续期
+        wakeLockRenewer?.let { wakeLockHandler.removeCallbacks(it) }
+
+        // 停止用户 activity 模拟
+        userActivityRunnable?.let { userActivityHandler.removeCallbacks(it) }
+
+        // 释放 WakeLock
+        wakeLock?.let {
+            if (it.isHeld) {
+                it.release()
+                Log.d(TAG, "WakeLock released")
+            }
+        }
     }
 
     /**
@@ -445,5 +560,7 @@ class MainActivity : AppCompatActivity() {
         private const val TAG = "MainActivity"
         private const val TIME_UPDATE_INTERVAL = 60_000L // 1分钟更新一次时间
         private const val LONG_PRESS_DURATION = 5000L // 5秒长按
+        private const val WAKELOCK_RENEW_INTERVAL = 8 * 60 * 1000L // 8分钟续期一次
+        private const val USER_ACTIVITY_INTERVAL = 3 * 60 * 1000L // 3分钟模拟一次用户 activity
     }
 }
