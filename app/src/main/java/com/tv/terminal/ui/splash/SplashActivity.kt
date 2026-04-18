@@ -1,9 +1,13 @@
 package com.tv.terminal.ui.splash
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
+import android.util.Log
+import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import android.view.animation.AnimationSet
@@ -13,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.tv.terminal.R
 import com.tv.terminal.data.local.SharedPreferencesManager
 import com.tv.terminal.databinding.ActivitySplashBinding
+import com.tv.terminal.service.KeepAliveService
 import com.tv.terminal.ui.main.MainActivity
 import com.tv.terminal.ui.setting.SettingActivity
 import com.tv.terminal.util.DeviceUtils
@@ -26,11 +31,18 @@ import kotlinx.coroutines.launch
 class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySplashBinding
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // 保持屏幕常亮，防止启动过程中息屏
+        acquireWakeLock()
+
+        // 启动前台服务保活（从启动页就开始保护）
+        KeepAliveService.start(this)
 
         // 播放启动动画
         playEntranceAnimation()
@@ -39,6 +51,24 @@ class SplashActivity : AppCompatActivity() {
         Handler(Looper.getMainLooper()).postDelayed({
             initAndNavigate()
         }, SPLASH_DELAY)
+    }
+
+    /**
+     * 获取 WakeLock 防止启动过程中息屏
+     */
+    private fun acquireWakeLock() {
+        // 1. FLAG_KEEP_SCREEN_ON
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        Log.d(TAG, "SplashActivity: FLAG_KEEP_SCREEN_ON enabled")
+
+        // 2. WakeLock
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(
+            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+            "TvTerminal:SplashWakeLock"
+        )
+        wakeLock?.acquire()
+        Log.d(TAG, "SplashActivity: WakeLock acquired")
     }
 
     /**
@@ -117,7 +147,19 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // 释放 WakeLock
+        wakeLock?.let {
+            if (it.isHeld) {
+                it.release()
+                Log.d(TAG, "SplashActivity: WakeLock released")
+            }
+        }
+    }
+
     companion object {
+        private const val TAG = "SplashActivity"
         private const val SPLASH_DELAY = 2500L // 2.5秒
     }
 }

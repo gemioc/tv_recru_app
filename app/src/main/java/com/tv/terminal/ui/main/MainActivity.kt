@@ -18,13 +18,13 @@ import androidx.lifecycle.lifecycleScope
 import com.tv.terminal.R
 import com.tv.terminal.data.local.SharedPreferencesManager
 import com.tv.terminal.data.remote.HeartbeatManager
+import com.tv.terminal.service.KeepAliveService
 import com.tv.terminal.data.remote.WebSocketManager
 import com.tv.terminal.data.remote.model.*
 import com.tv.terminal.databinding.ActivityMainBinding
 import com.tv.terminal.ui.poster.PosterFragment
 import com.tv.terminal.ui.setting.SettingActivity
 import com.tv.terminal.ui.video.VideoFragment
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -67,6 +67,9 @@ class MainActivity : AppCompatActivity() {
 
         // 保持屏幕常亮（多重保障）
         acquireAndKeepWakeLock()
+
+        // 启动前台服务保活
+        KeepAliveService.start(this)
 
         // 全屏显示
         setupFullScreen()
@@ -160,8 +163,8 @@ class MainActivity : AppCompatActivity() {
                 userActivityHandler.postDelayed(this, USER_ACTIVITY_INTERVAL)
             }
         }
-        // 延迟 2 分钟后开始模拟（每 3 分钟模拟一次）
-        userActivityHandler.postDelayed(userActivityRunnable!!, USER_ACTIVITY_INTERVAL)
+        // 延迟 1 分钟后开始模拟（每 3 分钟模拟一次）
+        userActivityHandler.postDelayed(userActivityRunnable!!, USER_ACTIVITY_INITIAL_DELAY)
         Log.d(TAG, "User activity simulation started, interval: ${USER_ACTIVITY_INTERVAL}ms")
     }
 
@@ -536,6 +539,9 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "WakeLock released")
             }
         }
+
+        // 停止保活服务
+        KeepAliveService.stop(this)
     }
 
     /**
@@ -559,6 +565,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val TIME_UPDATE_INTERVAL = 60_000L // 1分钟更新一次时间
+        private const val USER_ACTIVITY_INITIAL_DELAY = 60_000L // 1分钟后开始模拟
         private const val LONG_PRESS_DURATION = 5000L // 5秒长按
         private const val WAKELOCK_RENEW_INTERVAL = 8 * 60 * 1000L // 8分钟续期一次
         private const val USER_ACTIVITY_INTERVAL = 3 * 60 * 1000L // 3分钟模拟一次用户 activity
