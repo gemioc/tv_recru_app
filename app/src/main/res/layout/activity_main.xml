@@ -11,10 +11,14 @@
     <!-- 内容展示区域 -->
     <FrameLayout
         android:id="@+id/contentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
-    <!-- 顶部状态栏 -->
+    <!-- 顶部状态栏 - 不透明，遥控互动时显示 -->
     <LinearLayout
         android:id="@+id/statusBar"
         android:layout_width="match_parent"
@@ -23,7 +27,8 @@
         android:gravity="center_vertical"
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:background="@android:color/transparent"
+        android:background="#E61A1A2E"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- 左侧：在线状态 -->
@@ -45,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/status_offline"
-                android:textColor="@color/text_secondary"
+                android:textColor="#FFFFFF"
                 android:textSize="14sp" />
 
         </LinearLayout>
@@ -57,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="#606060"
+            android:textColor="#FFFFFF"
             android:textSize="13sp"
             tools:text="设备: TV-001" />
 
@@ -66,7 +71,7 @@
             android:id="@+id/timeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_secondary"
+            android:textColor="#FFFFFF"
             android:textSize="14sp"
             tools:text="14:30" />
 

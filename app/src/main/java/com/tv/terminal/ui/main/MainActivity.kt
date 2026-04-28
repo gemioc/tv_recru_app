@@ -1,5 +1,6 @@
 package com.tv.terminal.ui.main
 
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +12,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -60,6 +62,11 @@ class MainActivity : AppCompatActivity() {
     private val userActivityHandler = Handler(Looper.getMainLooper())
     private var userActivityRunnable: Runnable? = null
 
+    // 状态栏自动隐藏 Handler
+    private val statusBarHandler = Handler(Looper.getMainLooper())
+    private var statusBarHideRunnable: Runnable? = null
+    private var isStatusBarVisible = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -88,6 +95,110 @@ class MainActivity : AppCompatActivity() {
 
         // 设置长按监听
         setupLongPressListener()
+
+        // 初始化状态栏（默认隐藏）
+        initStatusBar()
+    }
+
+    /**
+     * 初始化状态栏
+     * 默认隐藏，遥控器操作时显示
+     */
+    private fun initStatusBar() {
+        binding.statusBar.visibility = View.GONE
+        binding.statusBar.alpha = 0f
+        isStatusBarVisible = false
+        // 初始隐藏contentContainer的顶部约束（因为状态栏默认隐藏）
+        updateContentContainerTopMargin()
+    }
+
+    /**
+     * 显示状态栏（带动画）
+     */
+    private fun showStatusBar() {
+        if (isStatusBarVisible) {
+            // 已显示，重置隐藏倒计时
+            resetStatusBarHideTimer()
+            return
+        }
+
+        isStatusBarVisible = true
+        binding.statusBar.visibility = View.VISIBLE
+
+        // 淡入动画
+        ObjectAnimator.ofFloat(binding.statusBar, "alpha", 0f, 1f).apply {
+            duration = STATUS_BAR_ANIMATION_DURATION
+            interpolator = DecelerateInterpolator()
+            start()
+        }
+
+        // 更新contentContainer顶部约束
+        updateContentContainerTopMargin()
+
+        // 启动隐藏倒计时
+        startStatusBarHideTimer()
+    }
+
+    /**
+     * 隐藏状态栏（带动画）
+     */
+    private fun hideStatusBar() {
+        if (!isStatusBarVisible) return
+
+        isStatusBarVisible = false
+
+        // 淡出动画
+        ObjectAnimator.ofFloat(binding.statusBar, "alpha", 1f, 0f).apply {
+            duration = STATUS_BAR_ANIMATION_DURATION
+            interpolator = DecelerateInterpolator()
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    binding.statusBar.visibility = View.GONE
+                }
+            })
+            start()
+        }
+
+        // 更新contentContainer顶部约束
+        updateContentContainerTopMargin()
+    }
+
+    /**
+     * 重置状态栏隐藏倒计时
+     */
+    private fun resetStatusBarHideTimer() {
+        statusBarHideRunnable?.let { statusBarHandler.removeCallbacks(it) }
+        startStatusBarHideTimer()
+    }
+
+    /**
+     * 启动状态栏自动隐藏倒计时
+     */
+    private fun startStatusBarHideTimer() {
+        statusBarHideRunnable = Runnable {
+            hideStatusBar()
+        }
+        statusBarHandler.postDelayed(statusBarHideRunnable!!, STATUS_BAR_HIDE_DELAY)
+    }
+
+    /**
+     * 更新contentContainer顶部边距（根据状态栏是否显示）
+     */
+    private fun updateContentContainerTopMargin() {
+        val params = binding.contentContainer.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+        if (isStatusBarVisible) {
+            params.topMargin = 0
+        } else {
+            params.topMargin = 0
+        }
+        binding.contentContainer.layoutParams = params
+    }
+
+    /**
+     * 处理遥控器/按键事件，显示状态栏并重置倒计时
+     */
+    private fun onRemoteInput() {
+        showStatusBar()
     }
 
     /**
@@ -489,12 +600,14 @@ class MainActivity : AppCompatActivity() {
                         openSetting()
                     }
                     longPressHandler.postDelayed(longPressRunnable!!, LONG_PRESS_DURATION)
+                    onRemoteInput() // 触摸也触发状态栏显示
                     true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     longPressRunnable?.let {
                         longPressHandler.removeCallbacks(it)
                     }
+                    onRemoteInput() // 松开也触发状态栏显示
                     true
                 }
                 else -> false
@@ -532,6 +645,9 @@ class MainActivity : AppCompatActivity() {
         // 停止用户 activity 模拟
         userActivityRunnable?.let { userActivityHandler.removeCallbacks(it) }
 
+        // 停止状态栏隐藏倒计时
+        statusBarHideRunnable?.let { statusBarHandler.removeCallbacks(it) }
+
         // 释放 WakeLock
         wakeLock?.let {
             if (it.isHeld) {
@@ -549,6 +665,7 @@ class MainActivity : AppCompatActivity() {
      * 按菜单键或播放键打开设置页面
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        onRemoteInput() // 任何按键都触发状态栏显示
         when (keyCode) {
             KeyEvent.KEYCODE_MENU -> {
                 openSetting()
@@ -569,5 +686,7 @@ class MainActivity : AppCompatActivity() {
         private const val LONG_PRESS_DURATION = 5000L // 5秒长按
         private const val WAKELOCK_RENEW_INTERVAL = 8 * 60 * 1000L // 8分钟续期一次
         private const val USER_ACTIVITY_INTERVAL = 3 * 60 * 1000L // 3分钟模拟一次用户 activity
+        private const val STATUS_BAR_HIDE_DELAY = 5000L // 5秒无操作隐藏状态栏
+        private const val STATUS_BAR_ANIMATION_DURATION = 300L // 状态栏动画时长
     }
 }
